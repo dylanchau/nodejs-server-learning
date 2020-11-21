@@ -1,0 +1,19 @@
+{
+  "name": "nodejs-server-learning",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start:dev": "nodemon ./src/server.js",
+    "code:format": "./node_modules/.bin/prettier --write \"src/**/*.{js}\"",
+    "code:lint": "./node_modules/.bin/eslint . --ext .js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "nodemon": "^2.0.6",
+    "prettier": "^2.2.0"
+  }
+}
