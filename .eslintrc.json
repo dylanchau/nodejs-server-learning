@@ -9,7 +9,7 @@
     ],
     "extends": [
         "eslint:recommended",
-        "node",
+        // "node",
         "plugin:prettier/recommended",
         "prettier"
     ],
@@ -25,12 +25,13 @@
         "ecmaVersion": 12
     },
     "rules": {
+        // "quotes": ["error", "single"],
         "quotes":["error", "single", {"avoidEscape": true}],
         "semi": ["error", "always"],
         "semi-spacing": ["error", {"before": false, "after": true}],
         "semi-style": ["error", "last"],
         "no-extra-semi": "error",
         "no-empty-function": "warn",
-        "prettier/prettier": "error"
+        "prettier/prettier": ["error", {"singleQuote": true }]
     }
 }
