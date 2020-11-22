@@ -1,4 +1,7 @@
 const express = require('express');
+
+const ProductSchema = require('../models/products');
+
 const router = express.Router();
 
 router.get('/', (req, res) => {
@@ -7,18 +10,29 @@ router.get('/', (req, res) => {
   });
 });
 
-router.get('/:productId', (req, res) => {
-  const { productId } = req.params;
-  res.json({
-    message: `You are fetching info of product with id ${productId}`,
+router.get('/:productId', async (req, res) => {
+  const { productId: id } = req.params;
+  const product = await ProductSchema.findById(id);
+
+  res.status(200).json({
+    data: product,
   });
 });
 
 router.post('/', (req, res) => {
-  const data = req.body;
-  res.json({
-    data,
-  });
+  const { name, price, quantity } = req.body;
+
+  const product = new ProductSchema({ name, price, quantity });
+  product
+    .save()
+    .then((result) => {
+      res.status(201).json({
+        data: {
+          product: result,
+        },
+      });
+    })
+    .catch((err) => console.log(err));
 });
 
 router.patch('/:productId', (req, res) => {

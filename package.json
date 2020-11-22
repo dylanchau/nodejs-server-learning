@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start:dev": "nodemon ./src/server.js",
+    "start:dev": "nodemon ./src/server.js --config ./nodemon.js",
+    "start:debug": "nodemon --inspect ./src/server.js",
     "code:format": "./node_modules/.bin/prettier --write \"./src/**/*.js\"",
     "code:lint": "./node_modules/.bin/eslint \"**/*.js\" --fix"
   },
@@ -12,7 +13,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "mongoose": "^5.10.15"
   },
   "devDependencies": {
     "eslint-config-prettier": "^6.15.0",
