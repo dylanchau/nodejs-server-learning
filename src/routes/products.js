@@ -4,15 +4,16 @@ const ProductSchema = require('../models/products');
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
+  const allProducts = await ProductSchema.find().select('-__v');
   res.status(200).json({
-    message: 'Handing GET request to /products',
+    data: allProducts,
   });
 });
 
 router.get('/:productId', async (req, res) => {
   const { productId: id } = req.params;
-  const product = await ProductSchema.findById(id);
+  const product = await ProductSchema.findById(id).select('-__v');
 
   res.status(200).json({
     data: product,
@@ -32,18 +33,51 @@ router.post('/', (req, res) => {
         },
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.log(err);
+      res.status(404).json({
+        error: err.message,
+      });
+    });
 });
 
-router.patch('/:productId', (req, res) => {
-  res.json({
-    message: `Product with ${req.params.productId} updated`,
+router.patch('/:productId', async (req, res) => {
+  const { productId: id } = req.params;
+  const query = req.body;
+
+  const updatedProduct = await ProductSchema.findByIdAndUpdate(id, query, {
+    new: true,
+  }).select('-__v');
+
+  res.status(200).json({
+    data: updatedProduct,
   });
 });
 
-router.delete('/:productId', (req, res) => {
-  res.json({
-    message: `Product with ${req.params.productId} deleted`,
+router.delete('/:productId', async (req, res) => {
+  const { productId: id } = req.params;
+  let result = {};
+  try {
+    const deletedProduct = await ProductSchema.findByIdAndDelete(id);
+    result = {
+      message: 'Deleted Successfully',
+      status: 200,
+    };
+    if (!deletedProduct) {
+      result = {
+        message: `Cannot found product with id=${id}`,
+        status: 404,
+      };
+    }
+  } catch (err) {
+    result = {
+      message: `Deleted fail: ${err}`,
+      status: 500,
+    };
+  }
+
+  res.status(result.status).json({
+    message: result.message,
   });
 });
 module.exports = router;

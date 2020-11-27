@@ -1,36 +1,81 @@
 const express = require('express');
 
+const OrderSchema = require('../models/orders');
+const { calculateTotal } = require('../utils');
+
 const router = express.Router();
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
+  const allOrders = await OrderSchema.find().select('-__v').exec();
   res.status(200).json({
-    message: 'Handing GET request to orders/',
+    data: allOrders,
   });
 });
 
-router.get('/:orderId', (req, res) => {
-  const { orderId } = req.params;
-  res.json({
-    message: `You are fetching info of order with id ${orderId}`,
+router.get('/:orderId', async (req, res) => {
+  const { orderId: id } = req.params;
+  const order = await OrderSchema.findById(id).select('-__v');
+
+  res.status(200).json({
+    data: order,
   });
 });
 
 router.post('/', (req, res) => {
-  const data = req.body;
-  res.json({
-    data,
+  const { description, products } = req.body;
+  const total = calculateTotal(products);
+  const order = new OrderSchema({ description, total, products });
+  order
+    .save()
+    .then((result) => {
+      res.status(201).json({
+        data: result,
+      });
+    })
+    .catch((err) => {
+      res.status(500).json({
+        error: err.message,
+      });
+    });
+});
+
+router.patch('/:orderId', async (req, res) => {
+  const { orderId: id } = req.params;
+  const query = req.body;
+
+  const updatedOrder = await OrderSchema.findByIdAndUpdate(id, query, {
+    new: true,
+  }).select('-__v');
+
+  res.status(200).json({
+    data: updatedOrder,
   });
 });
 
-router.patch('/:orderId', (req, res) => {
-  res.json({
-    message: `Order with ${req.params.orderId} updated`,
-  });
-});
+router.delete('/:orderId', async (req, res) => {
+  const { orderId: id } = req.params;
+  let result = {};
+  try {
+    const deletedOrder = await OrderSchema.findByIdAndDelete(id);
+    result = {
+      message: 'Deleted Successfully',
+      status: 200,
+    };
+    if (!deletedOrder) {
+      result = {
+        message: `Cannot found order with id=${id}`,
+        status: 404,
+      };
+    }
+  } catch (err) {
+    result = {
+      message: `Deleted fail: ${err}`,
+      status: 500,
+    };
+  }
 
-router.delete('/:orderId', (req, res) => {
-  res.json({
-    message: `Order with ${req.params.orderId} deleted`,
+  res.status(result.status).json({
+    message: result.message,
   });
 });
 
