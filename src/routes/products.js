@@ -3,7 +3,16 @@ const multer = require('multer');
 
 const ProductSchema = require('../models/products');
 
-const { uploadFile } = require('../file-upload/uploadFile');
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './uploads/');
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  },
+});
+
+const upload = multer({ storage });
 
 const router = express.Router();
 
@@ -23,34 +32,27 @@ router.get('/:productId', async (req, res) => {
   });
 });
 
-router.post(
-  '/',
-  (req, res, next) => {
-    uploadFile;
-    next();
-  },
-  (req, res) => {
-    console.log(req.file);
-    const { name, price, quantity } = req.body;
+router.post('/', upload.single('image'), (req, res) => {
+  console.log(req.file);
+  const { name, price, quantity } = req.body;
 
-    const product = new ProductSchema({ name, price, quantity });
-    product
-      .save()
-      .then((result) => {
-        res.status(201).json({
-          data: {
-            product: result,
-          },
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(404).json({
-          error: err.message,
-        });
+  const product = new ProductSchema({ name, price, quantity });
+  product
+    .save()
+    .then((result) => {
+      res.status(201).json({
+        data: {
+          product: result,
+        },
       });
-  }
-);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(404).json({
+        error: err.message,
+      });
+    });
+});
 
 router.patch('/:productId', async (req, res) => {
   const { productId: id } = req.params;
