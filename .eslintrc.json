@@ -32,6 +32,7 @@
         "semi-style": ["error", "last"],
         "no-extra-semi": "error",
         "no-empty-function": "warn",
-        "prettier/prettier": ["error", {"singleQuote": true }]
+        "prettier/prettier": ["error", {"singleQuote": true }],
+        "no-unused-vars": "off"
     }
 }

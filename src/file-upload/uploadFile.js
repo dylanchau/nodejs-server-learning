@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 const multer = require('multer');
 
 module.exports = (req, res, next) => {
