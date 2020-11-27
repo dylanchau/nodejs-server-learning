@@ -1,6 +1,10 @@
+/* eslint-disable no-unused-vars */
 const express = require('express');
+const multer = require('multer');
 
 const ProductSchema = require('../models/products');
+
+const { uploadFile } = require('../file-upload/uploadFile');
 
 const router = express.Router();
 
@@ -20,26 +24,34 @@ router.get('/:productId', async (req, res) => {
   });
 });
 
-router.post('/', (req, res) => {
-  const { name, price, quantity } = req.body;
+router.post(
+  '/',
+  (req, res, next) => {
+    uploadFile;
+    next();
+  },
+  (req, res) => {
+    console.log(req.file);
+    const { name, price, quantity } = req.body;
 
-  const product = new ProductSchema({ name, price, quantity });
-  product
-    .save()
-    .then((result) => {
-      res.status(201).json({
-        data: {
-          product: result,
-        },
+    const product = new ProductSchema({ name, price, quantity });
+    product
+      .save()
+      .then((result) => {
+        res.status(201).json({
+          data: {
+            product: result,
+          },
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(404).json({
+          error: err.message,
+        });
       });
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(404).json({
-        error: err.message,
-      });
-    });
-});
+  }
+);
 
 router.patch('/:productId', async (req, res) => {
   const { productId: id } = req.params;
