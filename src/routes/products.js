@@ -2,9 +2,10 @@ const express = require('express');
 const multer = require('multer');
 
 const ProductSchema = require('../models/products');
+const { validateProductId } = require('../validation/productValidator');
+const { storage, limits } = require('../file-upload/uploadFile');
 
-const { uploadFile } = require('../file-upload/uploadFile');
-
+const upload = multer({ storage, limits });
 const router = express.Router();
 
 router.get('/', async (req, res) => {
@@ -14,43 +15,44 @@ router.get('/', async (req, res) => {
   });
 });
 
-router.get('/:productId', async (req, res) => {
+router.get('/:productId', async (req, res, next) => {
   const { productId: id } = req.params;
+  if (!validateProductId(id)) {
+    const err = new Error(`Parameter ${id} is invalid`);
+    next(err);
+  }
   const product = await ProductSchema.findById(id).select('-__v');
-
   res.status(200).json({
     data: product,
   });
 });
 
-router.post(
-  '/',
-  (req, res, next) => {
-    uploadFile;
-    next();
-  },
-  (req, res) => {
-    console.log(req.file);
-    const { name, price, quantity } = req.body;
+router.post('/', upload.single('image'), (req, res) => {
+  const { name, price, quantity } = req.body;
+  const image = (req.file && req.file.filename) || null;
 
-    const product = new ProductSchema({ name, price, quantity });
-    product
-      .save()
-      .then((result) => {
-        res.status(201).json({
-          data: {
-            product: result,
-          },
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(404).json({
-          error: err.message,
-        });
+  const product = new ProductSchema({
+    name,
+    price,
+    quantity,
+    image,
+  });
+  product
+    .save()
+    .then((result) => {
+      res.status(201).json({
+        data: {
+          product: result,
+        },
       });
-  }
-);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(404).json({
+        error: err.message,
+      });
+    });
+});
 
 router.patch('/:productId', async (req, res) => {
   const { productId: id } = req.params;
