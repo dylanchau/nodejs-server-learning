@@ -106,3 +106,6 @@ dist
 
 # vscode workspace config
 .vscode/
+
+# upload folder
+uploads/**/*

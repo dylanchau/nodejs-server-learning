@@ -2,18 +2,10 @@ const express = require('express');
 const multer = require('multer');
 
 const ProductSchema = require('../models/products');
+const { validateProductId } = require('../validation/productValidator');
+const { storage, limits } = require('../file-upload/uploadFile');
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, './uploads/');
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname);
-  },
-});
-
-const upload = multer({ storage });
-
+const upload = multer({ storage, limits });
 const router = express.Router();
 
 router.get('/', async (req, res) => {
@@ -23,20 +15,28 @@ router.get('/', async (req, res) => {
   });
 });
 
-router.get('/:productId', async (req, res) => {
+router.get('/:productId', async (req, res, next) => {
   const { productId: id } = req.params;
+  if (!validateProductId(id)) {
+    const err = new Error(`Parameter ${id} is invalid`);
+    next(err);
+  }
   const product = await ProductSchema.findById(id).select('-__v');
-
   res.status(200).json({
     data: product,
   });
 });
 
 router.post('/', upload.single('image'), (req, res) => {
-  console.log(req.file);
   const { name, price, quantity } = req.body;
+  const image = (req.file && req.file.filename) || null;
 
-  const product = new ProductSchema({ name, price, quantity });
+  const product = new ProductSchema({
+    name,
+    price,
+    quantity,
+    image,
+  });
   product
     .save()
     .then((result) => {
