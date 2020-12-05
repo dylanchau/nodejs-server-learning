@@ -2,8 +2,8 @@ const express = require('express');
 const multer = require('multer');
 
 const ProductSchema = require('../models/products');
-const { validateProductId } = require('../validation/productValidator');
 const { storage, limits } = require('../file-upload/uploadFile');
+const { validateProductId } = require('../validation/productValidator');
 
 const upload = multer({ storage, limits });
 const router = express.Router();

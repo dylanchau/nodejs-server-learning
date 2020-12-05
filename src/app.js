@@ -1,10 +1,10 @@
-const express = require('express');
 const bodyParser = require('body-parser');
+const express = require('express');
 
-const productRouter = require('./routes/products');
-const ordersRouter = require('./routes/orders');
-const userAccountRouter = require('./routes/userAccount');
 const logger = require('./logger');
+const ordersRouter = require('./routes/orders');
+const productRouter = require('./routes/products');
+const userAccountRouter = require('./routes/userAccount');
 
 const app = express();
 app.use(bodyParser.json());
