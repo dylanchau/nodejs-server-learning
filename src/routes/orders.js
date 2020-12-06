@@ -3,16 +3,18 @@ const express = require('express');
 const OrderSchema = require('../models/orders');
 const { calculateTotal } = require('../utils');
 
+const authMiddleware = require('../middleware/check-auth');
+
 const router = express.Router();
 
-router.get('/', async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
   const allOrders = await OrderSchema.find().select('-__v').exec();
   res.status(200).json({
     data: allOrders,
   });
 });
 
-router.get('/:orderId', async (req, res) => {
+router.get('/:orderId', authMiddleware, async (req, res) => {
   const { orderId: id } = req.params;
   const order = await OrderSchema.findById(id).select('-__v');
 
@@ -21,7 +23,7 @@ router.get('/:orderId', async (req, res) => {
   });
 });
 
-router.post('/', (req, res) => {
+router.post('/', authMiddleware, (req, res) => {
   const { description, products } = req.body;
   const total = calculateTotal(products);
   const order = new OrderSchema({ description, total, products });
@@ -39,7 +41,7 @@ router.post('/', (req, res) => {
     });
 });
 
-router.patch('/:orderId', async (req, res) => {
+router.patch('/:orderId', authMiddleware, async (req, res) => {
   const { orderId: id } = req.params;
   const query = req.body;
 
@@ -52,7 +54,7 @@ router.patch('/:orderId', async (req, res) => {
   });
 });
 
-router.delete('/:orderId', async (req, res) => {
+router.delete('/:orderId', authMiddleware, async (req, res) => {
   const { orderId: id } = req.params;
   let result = {};
   try {

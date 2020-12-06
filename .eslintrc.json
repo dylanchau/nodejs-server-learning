@@ -5,7 +5,8 @@
         "es2021": true
     },
     "plugins": [
-        "prettier"
+        "prettier",
+        "sort-requires"
     ],
     "extends": [
         "eslint:recommended",
@@ -33,6 +34,7 @@
         "no-extra-semi": "error",
         "no-empty-function": "warn",
         "prettier/prettier": ["error", {"singleQuote": true }],
-        "no-unused-vars": "off"
+        "no-unused-vars": "off",
+        "sort-requires/sort-requires": 2
     }
 }

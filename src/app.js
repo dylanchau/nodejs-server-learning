@@ -1,9 +1,10 @@
-const express = require('express');
 const bodyParser = require('body-parser');
+const express = require('express');
 
-const productRouter = require('./routes/products');
-const ordersRouter = require('./routes/orders');
 const logger = require('./logger');
+const ordersRouter = require('./routes/orders');
+const productRouter = require('./routes/products');
+const userAccountRouter = require('./routes/userAccount');
 
 const app = express();
 app.use(bodyParser.json());
@@ -28,6 +29,7 @@ app.use(logger);
 
 app.use('/products', productRouter);
 app.use('/orders', ordersRouter);
+app.use('/user', userAccountRouter);
 
 app.use((req, res, next) => {
   const err = new Error('Not found');
