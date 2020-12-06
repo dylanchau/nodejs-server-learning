@@ -1,0 +1,8 @@
+{
+  "env": {
+    "MONGOOSE_URL": "",
+    "SALT_HASH": "",
+    "JWT_SECRET_KEY": "",
+    "EXPIRE_PERIOD": "1h"
+  }
+}
