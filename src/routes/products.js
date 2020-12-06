@@ -1,6 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 
+const authMiddleware = require('../middleware/check-auth');
 const ProductSchema = require('../models/products');
 const { storage, limits } = require('../file-upload/uploadFile');
 const { validateProductId } = require('../validation/productValidator');
@@ -27,7 +28,7 @@ router.get('/:productId', async (req, res, next) => {
   });
 });
 
-router.post('/', upload.single('image'), (req, res) => {
+router.post('/', authMiddleware, upload.single('image'), (req, res) => {
   const { name, price, quantity } = req.body;
   const image = (req.file && req.file.filename) || null;
 
@@ -54,7 +55,7 @@ router.post('/', upload.single('image'), (req, res) => {
     });
 });
 
-router.patch('/:productId', async (req, res) => {
+router.patch('/:productId', authMiddleware, async (req, res) => {
   const { productId: id } = req.params;
   const query = req.body;
 
@@ -67,7 +68,7 @@ router.patch('/:productId', async (req, res) => {
   });
 });
 
-router.delete('/:productId', async (req, res) => {
+router.delete('/:productId', authMiddleware, async (req, res) => {
   const { productId: id } = req.params;
   let result = {};
   try {
